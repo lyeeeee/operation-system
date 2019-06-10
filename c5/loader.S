@@ -3,7 +3,6 @@
 section loader vstart=LOADER_BASE_ADDR
 LOADER_STACK_TOP equ LOADER_BASE_ADDR
 
-jmp loader_start
 
 	GDT_BASE: dd 0x00000000
 		  dd 0x00000000
@@ -30,14 +29,14 @@ jmp loader_start
 	
 	;下面存放读取到的内存信息，读完之后统一处理
 	;进行一下对齐顺便
-	ards_buff times 211 db 0 ;用来存放返回的结构体
+	ards_buff times 214 db 0 ;用来存放返回的结构体
 	ards_num dw 0 ;返回ards的数量
 	
 
 
 loader_start:
 	;----------------------获取内存信息-----------------------------
-	mov ebx,0
+	xor ebx,0
 	mov edx,0x534d4150
 	mov di,ards_buff
 .e820_read_mem:
@@ -55,7 +54,7 @@ loader_start:
 	xor edx,edx ; 在edx中存放最大的内存段，即为要查找的内存总量
 .find_max_mem:
 	mov eax,[ebx]
-	mov eax,[ebx+8]
+	add eax,[ebx+8]
 	add ebx,20
 	cmp edx,eax
 	jge .next_ards_check
@@ -66,7 +65,7 @@ loader_start:
 
 .e801_read_mem:
 	;先获取15M以下的内存
-	mov eax,0x0000e801
+	mov ax,0xe801
 	int 0x15
 	jc .88_read_mem
 	mov cx,0x400
@@ -75,14 +74,14 @@ loader_start:
 	and eax,0x0000ffff
 	or edx,eax
 	add edx,0x100000
-	mov edi,edx
+	mov esi,edx
 	;再获取16M以上的内存
 	xor eax,eax
 	mov ax,bx
 	mov ecx,0x10000
 	mul ecx
-	add eax,edi ; 因为e801方法只能获取4gb以下内存，所以edx中高32位的内容肯定为0
-	mov edx,eax
+	add esi,eax ; 因为e801方法只能获取4gb以下内存，所以edx中高32位的内容肯定为0
+	mov edx,esi
 	jmp .mem_find_ok
 
 
@@ -90,10 +89,10 @@ loader_start:
 	mov ah,0x88
 	int 0x15
 	jc .find_mem_erro
+	and eax,0x0000ffff
 	mov cx,0x400
 	mul cx
 	shl edx,16
-	add eax,0x0000ffff
 	or edx,eax
 	add edx,0x100000
 	jmp .mem_find_ok
