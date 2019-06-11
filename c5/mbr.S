@@ -32,7 +32,7 @@ SECTION MBR vstart=0x7c00
 	mov eax,LOADER_START_SECTOR 
 	mov bx,LOADER_BASE_ADDR
 	call rd_disk_m_16
-	jmp LOADER_BASE_ADDR
+	jmp LOADER_BASE_ADDR + 0x300
 	;功能：读取n个扇区
 rd_disk_m_16:
 	;eax加载的起始扇区号	
