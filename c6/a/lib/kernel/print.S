@@ -8,25 +8,46 @@ section .text
 
 global put_char
 
+global print_str
+
+print_str:  ;实现打印字符串
+	push ebx
+	push ecx
+
+	xor ecx,ecx
+	mov ebx,[esp+12]
+.go_on:	mov cl,[ebx]
+	cmp cl,0
+	jz .str_end
+	push ecx
+	call put_char
+	add esp,4
+	inc ebx
+	loop .go_on	
+.str_end:
+	pop ecx
+	pop ebx
+	ret
+	
 put_char:
 	pushad ; 备份32位寄存器环境
 	mov ax,video_selector
 	mov gs,ax
 	
 	;获取当前光标位置
-	mov dx,0x3d4
+	mov dx,0x03d4
 	mov al,0x0e
 	out dx,al
 	
-	mov dx,0x3d5
+	mov dx,0x03d5
 	in al,dx
 	mov ah,al
 
-	mov dx,0x3d4
+	mov dx,0x03d4
 	mov al,0x0f
 	out dx,al
 	
-	mov dx,0x3d5
+	mov dx,0x03d5
 	in al,dx
 
 	mov bx,ax
@@ -59,11 +80,13 @@ put_char:
 
 
 .put_other: 	;处理正常字符
+	mov byte [gs:480],'N'
 	shl bx,1
 	mov byte [gs:bx],cl
 	inc bx
-	mov byte [gs:bx],0x70
+	mov byte [gs:bx],0x07
 	shr bx,1
+	inc bx
 	cmp bx,2000 ;光标值小于2000 说明没有超过屏幕范围
 	jl .set_cursor
 	
@@ -81,7 +104,6 @@ put_char:
 .is_carrage_return_end:
 	add bx,80
 	cmp bx,2000
-	jl .set_cursor
 .is_line_feed_end:
 	jl .set_cursor
 
