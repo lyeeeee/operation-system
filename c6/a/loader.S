@@ -203,7 +203,9 @@ protect_mode_start:
 
 kernel_entry_point:
 	call kernel_init
+	mov byte [gs:322],'V'
 	mov esp,0xc009f000
+	mov byte [gs:324],'V'
 	jmp KERNEL_ENTRY_POINT
 
 
@@ -223,7 +225,7 @@ kernel_init:
 	cmp byte [ebx],PT_NULL
 	je .NULL
 	push dword [ebx+16]
-	mov eax,[ebx+16]
+	mov eax,[ebx+4]
 	add eax,KERNEL_BIN_BASE_ADDR
 	push eax
 	push dword [ebx+8]
