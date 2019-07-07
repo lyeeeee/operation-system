@@ -4,6 +4,8 @@ RPL0 equ 0
 video_selector equ (0x0003 << 3) + TI_G + RPL0
 
 [bits 32]
+section .data
+put_int_buffer dq 0
 section .text
 
 global put_char
@@ -28,7 +30,64 @@ print_str:  ;实现打印字符串
 	pop ecx
 	pop ebx
 	ret
+
+;打印整数
+global put_int
+put_int:
+	pushad
+	mov ebp,esp
+	mov eax,[ebp+4*9]
+	mov edx,eax
+	mov ebx,put_int_buffer
+	mov edi,7
+	mov ecx,8
 	
+.handle_for_each_4bits:
+	and edx,0x0000000f
+	cmp edx,9
+	jg .atoz
+	add edx,'0'
+	jmp .store_4bits
+.atoz:
+	sub edx,10
+	add edx,'A'
+		
+.store_4bits:
+	mov [ebx+edi],dl
+	dec edi
+	shr eax,4
+	mov edx,eax
+	loop .handle_for_each_4bits
+
+.go_to_print:
+	inc edi
+.skip_prefixzero:
+	cmp edi,8
+	je .all_zero
+.go_on_skip:
+	mov cl,[put_int_buffer+edi]
+	inc edi
+	cmp cl,'0'
+	je .skip_prefixzero
+	dec edi
+	jmp .put_each_4bits
+	
+.all_zero:
+	mov cl,'0'
+
+.put_each_4bits:
+	push ecx
+	call put_char
+	add esp,4
+	inc edi
+	mov cl,[put_int_buffer+edi]
+	cmp edi,8
+	jl .put_each_4bits
+	popad
+	ret
+	
+		
+; 打印单个字符	
 put_char:
 	pushad ; 备份32位寄存器环境
 	mov ax,video_selector
