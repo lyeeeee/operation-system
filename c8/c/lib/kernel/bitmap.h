@@ -11,7 +11,7 @@ struct bit_map{
 };
 
 void bitmap_init(struct bit_map* btmp);
-void bitmap_scan_test(struct bit_map* btmp, uint32_t bit_idx);
-void bitmap_scan(struct bit_map* btmp, uint32_t cnt);
+bool bitmap_scan_test(struct bit_map* btmp, uint32_t bit_idx);
+int bitmap_scan(struct bit_map* btmp, uint32_t cnt);
 void bitmap_set(struct bit_map* btmp, uint32_t bit_idx, int8_t value);
 #endif
