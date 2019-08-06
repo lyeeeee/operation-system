@@ -47,7 +47,7 @@ exit_intr:
 	pop ds
 
 	add esp,4
-	iret
+	iretd
 
 VECTOR 0x00,ZERO
 VECTOR 0x01,ZERO

@@ -13,8 +13,8 @@ struct list_elem{
 };
 
 struct list{
-	struct list_elem* head;
-	struct list_elem* tail;
+	struct list_elem head;
+	struct list_elem tail;
 };
 
 typedef bool (function)(struct list_elem*, int arg);

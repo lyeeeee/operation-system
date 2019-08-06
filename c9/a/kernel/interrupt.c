@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "global.h"
 #include "io.h"
+#include "print.h"
 
 
 #define IDT_DESC_CNT 0x21
@@ -71,7 +72,7 @@ static void general_intr_handler(uint8_t vec_nr){
 	put_int(vec_nr);
 	put_char('\n');
 }
-static void exception_init(){
+static void exception_init(void){
 	int i = 0;
 	for(i = 0;i < IDT_DESC_CNT;++i){
 		idt_table[i] = general_intr_handler;

@@ -82,7 +82,7 @@ static void page_table_add(void* _vaddr, void* _page_phyaddr){
 	uint32_t* pde = pde_ptr(vaddr);
 	uint32_t* pte = pte_ptr(vaddr);
 
-	if((*pde & 0x00000001)){
+	if(*pde & 0x00000001){
 		//页目录向存在
 		ASSERT(!(*pte & 0x00000001));
 
@@ -195,7 +195,8 @@ static void mem_pool_init(uint32_t all_mem){
 
 void mem_init(void){
 	print_str("memonry init start\n");
-	uint32_t total_mem_bytes = *((uint32_t*)(0xb00));
+	//uint32_t total_mem_bytes = *((uint32_t*)(0xb00));
+	uint32_t total_mem_bytes = (*(uint32_t*)(0xb00));
 	print_str("total memonry:  0x"); put_int((int)total_mem_bytes);print_str("\n");
 	mem_pool_init(total_mem_bytes);
 	print_str("memonry init done\n");
