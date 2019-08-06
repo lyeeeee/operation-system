@@ -23,7 +23,7 @@ int bitmap_scan(struct bitmap* btmp, uint32_t cnt){
 		return -1;
 
 	int bit_idx = 0;
-	while( ((uint8_t)(BITMAP_MASK << bit_idx) & btmp->bits[byte_idx])){
+	while( (uint8_t)(BITMAP_MASK << bit_idx) & btmp->bits[byte_idx]){
 		bit_idx++;
 	}
 
@@ -31,19 +31,21 @@ int bitmap_scan(struct bitmap* btmp, uint32_t cnt){
 	if(cnt == 1)
 		return bit_index_start;
 	//这里不知道该不该减一，暂时写上	
-	uint32_t bit_left = (btmp->btmp_bytes_len*8-bit_index_start -1);
+	//uint32_t bit_left = (btmp->btmp_bytes_len*8-bit_index_start -1);
+	uint32_t bit_left = (btmp->btmp_bytes_len*8-bit_index_start);
 
 	uint32_t next_bit = bit_index_start + 1;
 	uint32_t count = 1;
 	bit_index_start = -1;
 	while(bit_left-- > 0){
-		if(!bitmap_scan_test(btmp,next_bit)){
+		if(!(bitmap_scan_test(btmp,next_bit))){
 			count++;	
 		}else{
 			count = 0;
 		}
 		if(count == cnt){
 			bit_index_start = next_bit - cnt +1;
+			break;
 		}
 		next_bit++;
 	}

@@ -2,6 +2,7 @@
 #define __THREAD_THREAD_H
 
 #include "stdint.h"
+#include "list.h"
 typedef void thread_func(void*);
 
 enum task_status{
@@ -84,5 +85,7 @@ void init_thread(struct task_struct*, char*, int);
 struct task_struct* thread_start(char*,int,thread_func,void*);
 
 
-
+void schedule(void);
+void thread_init(void);
+struct task_struct* running_thread(void);
 #endif

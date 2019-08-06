@@ -4,24 +4,30 @@
 #include "interrupt.h"
 #include "global.h"
 
-void list_insert_before(struct list_elem* before, stuct list_elem* elem){
+void list_init(struct list* plist){
+	plist->head.prev = NULL;
+	plist->head.next = &plist->tail;
+	plist->tail.next = NULL;
+	plist->tail.prev = &plist->head;
+}
+void list_insert_before(struct list_elem* before, struct list_elem* elem){
 	enum intr_status old_status = intr_disable();
 
 	before->prev->next = elem;
 	elem->prev = before->prev;
 	
-	before->prev = elem;
 	elem->next = before;
+	before->prev = elem;
 
 	intr_set_status(old_status);
 }
 
 void list_push(struct list* plist, struct list_elem* elem){
-	list_insert_before(plist->head, elem);
+	list_insert_before(plist->head.next, elem);
 }
 
 void list_append(struct list* plist, struct list_elem* elem){
-	list_insert_before(plist->tail,elem);
+	list_insert_before(&plist->tail,elem);
 }
 //开关中断
 void list_remove(struct list_elem* pelem){
@@ -35,6 +41,7 @@ void list_remove(struct list_elem* pelem){
 struct list_elem* list_pop(struct list* plist){
 	struct list_elem* elem = plist->head.next;
 	list_remove(elem);
+	return elem;
 }
 
 bool elem_find(struct list* plist, struct list_elem* obj_elem){

@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "global.h"
 #include "io.h"
+#include "print.h"
 
 
 #define IDT_DESC_CNT 0x21
@@ -67,11 +68,26 @@ static void general_intr_handler(uint8_t vec_nr){
 	if(vec_nr == 0x27 || vec_nr == 0x2f){
 		return;
 	}
-	print_str("int vector: 0x");
-	put_int(vec_nr);
-	put_char('\n');
+	set_cursor(0);
+	int cursor_pos = 0;
+	while(cursor_pos < 320){
+		put_char(' ');
+		cursor_pos++;
+	}
+	set_cursor(0);
+	print_str("!!!!!!!!!!!!  exception message begin   !!!!!!!!!!!!!!!\n");
+	set_cursor(88);
+	print_str(intr_name[vec_nr]);
+	
+	if(vec_nr == 14){
+		int page_fault_vaddr = 0;
+		asm volatile("movl %%cr2, %0":"=r"(page_fault_vaddr));
+		print_str("\npage fault addr is 0x");put_int(page_fault_vaddr);
+	}
+	print_str("!!!!!!!!!!!   exception message end     !!!!!!!!!!!!!!\n");
+	while(1);
 }
-static void exception_init(){
+static void exception_init(void){
 	int i = 0;
 	for(i = 0;i < IDT_DESC_CNT;++i){
 		idt_table[i] = general_intr_handler;
@@ -112,15 +128,19 @@ enum intr_status intr_set_status(enum intr_status status){
 
 
 enum intr_status intr_enable(void){
+	print_str("intr enable start\n");
 	enum intr_status old_status;
 	if(INTR_ON == intr_get_status()){
 		old_status = INTR_ON;
 		return old_status;
 	}else{
 		old_status = INTR_OFF;
+	print_str("intr enable intr off be\n");
 		asm volatile ("sti");
+	print_str("intr enable intr off\n");
 		return old_status;
 	}
+	print_str("intr enable end\n");
 }
 
 
@@ -136,9 +156,12 @@ enum intr_status intr_disable(void){
 	}
 }
 
+void register_handler(uint8_t vector_no, intr_handler function){
+	idt_table[vector_no] = function;
+}
 
 
-void idt_init(){
+void idt_init(void){
 	print_str("idt_init begin\n");
 	idt_desc_init();
 	exception_init();
