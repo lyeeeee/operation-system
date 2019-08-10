@@ -59,6 +59,7 @@
 #define	 IDT_DESC_ATTR_DPL3  ((IDT_DESC_P << 7) + (IDT_DESC_DPL3 << 5) + IDT_DESC_32_TYPE)
 
 #define NULL ((void*)0)
+#define DIV_ROUND_UP(X, STEP) ((X + STEP -1)/(STEP))
 #define bool int
 #define true 1
 #define false 0
@@ -75,4 +76,14 @@ struct gdt_desc{
 };
 
 #define PG_SIZE 4096
+
+
+//-------------------eflag 属性位 --------------------------
+#define EFLAGS_MBS (1 << 1) //必须设置
+#define EFLAGS_IF_1 (1 << 9) //开中断
+#define EFLAGS_IF_0 (0 << 9) //关中断
+#define EFLAGS_IOPL_3 (3 << 12)// 测试在用户态调用io
+#define EFLAGS_IOPL_0 (0 << 12)
+
+
 #endif
