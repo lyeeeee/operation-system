@@ -21,7 +21,7 @@ int main(void) {
    process_execute(u_prog_a, "user_prog_a");
    process_execute(u_prog_b, "user_prog_b");
    int i;
-   for(i = 0;i < 10000;++i){
+   for(i = 0;i < 100000;++i){
    
    }
    thread_start("cosumer_a", 31, k_thread_a, " A:");
@@ -39,6 +39,8 @@ void k_thread_a(void* arg) {
 	console_put_str(" thread_a:");
         console_put_int(sys_getpid());
 	console_put_str("\n");
+	int i;
+	for(i = 0;i < 100000;++i){}
 	console_put_str(" prog_a_pid:");
         console_put_int(prog_a_pid);
 	console_put_str("\n");
@@ -51,6 +53,9 @@ void k_thread_b(void* arg) {
 	console_put_str(" thread_b:");
         console_put_int(sys_getpid());
 	console_put_str("\n");
+	int i;
+	for(i = 0;i < 100000;++i){}
+	for(i = 0;i < 100000;++i){}
 	console_put_str(" prog_b_pid:");
         console_put_int(prog_b_pid);
 	console_put_str("\n");
