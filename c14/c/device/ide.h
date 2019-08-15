@@ -42,6 +42,5 @@ void intr_hd_handler(uint8_t irq_no);
 
 extern uint8_t channel_cnt;
 extern struct ide_channel channels[2];
-
 extern struct list partition_list;
 #endif
